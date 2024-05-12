@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Review</title>
+</head>
+<body>
+    <div>
+        <h2>Params: {{ params }}</h2>
+        <h3>Accepted: {{ accepted }}</h3>
+        <h3>Maybe: {{ maybe }}</h3>
+        <h3>Rejected: {{ rejected }}</h3>
+        <img src="data:image/png;base64,{{ plot_url }}" alt="Plot">
+        <div>
+            <a href="/update_status/{{ doc_id }}/Accepted">Accept</a>
+            <a href="/update_status/{{ doc_id }}/Maybe">Maybe</a>
+            <a href="/update_status/{{ doc_id }}/Rejected">Reject</a>
+        </div>
+        <p>{{ processed_docs }} processed from {{ total_docs }} documents.</p>
+    </div>
+</body>
+</html>
