@@ -23,7 +23,7 @@ coll = db['SP500_forecast_models']
 
 warnings.filterwarnings("ignore", module='statsmodels')
 
-def load_data(ticker="^GSPC", start_date='1990-01-02', end_date='2024-03-20', split_date='2023-01-01', apply_filter=False, debug=False):
+def load_data(ticker="^GSPC", start_date='1990-01-02', end_date='2024-03-20', split_date='2020-01-01', apply_filter=False, debug=False):
     """ Load data, perform forward fill, optionally apply a Butterworth filter, and split into train and test. """
     # Download historical data from Yahoo Finance
     df = yf.download(ticker, start=start_date, end=end_date)['Close']
