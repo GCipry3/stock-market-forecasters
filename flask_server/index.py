@@ -10,16 +10,16 @@ from darts import TimeSeries
 import io
 import base64
 from bson.objectid import ObjectId
+
 matplotlib.use('Agg')
+
 load_dotenv()
 
 app = Flask(__name__)
 uri = os.getenv("MONGO_URI")
 client = pymongo.MongoClient(uri)
 db = client["Licenta"]
-coll = db['tide']
-total_docs = coll.count_documents({})
-status_coll = db['tide_status']
+coll = db['SP500_forecast_models']
 
 def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries):
     plt.figure(figsize=(10, 6))
@@ -52,43 +52,42 @@ def extract_and_plot(doc):
 
 @app.route('/')
 def index():
-    document = coll.find_one({"mse":{"$exists":True}, "status_added":False})
+    return render_template('home.html')
+
+@app.route('/manual_check/<model>')
+def manual_check(model):
+    document = coll.find_one({"model": model, "mse": {"$exists": True}, "manual_status": {"$exists": False}})
     if document:
         plot_url, params = extract_and_plot(document)
-        processed_docs = status_coll.count_documents({})
-        accepted = status_coll.count_documents({'manual_status': 'Accepted'})
-        maybe = status_coll.count_documents({'manual_status': 'Maybe'})
-        rejected = status_coll.count_documents({'manual_status': 'Rejected'})
-        print('---------------')
-        print(f"Document ID: {document['_id']}")
-        print(params)
-
+        processed_docs = coll.count_documents({"model": model, "manual_status": {"$exists": True}})
+        accepted = coll.count_documents({'model': model, 'manual_status': 'Accepted'})
+        maybe = coll.count_documents({'model': model, 'manual_status': 'Maybe'})
+        rejected = coll.count_documents({'model': model, 'manual_status': 'Rejected'})
+        total_docs = coll.count_documents({"model": model, "manual_status": {"$exists": False}})
         return render_template('index.html', plot_url=plot_url, params=params, doc_id=document['_id'],
                                total_docs=total_docs, processed_docs=processed_docs, accepted=accepted, maybe=maybe, rejected=rejected)
     else:
-        return "No more documents to process!"
+        return f'No more {model} documents to process!<br><a href="/">HOME PAGE</a><br>'
 
-@app.route('/display/<status>')
-def display_models(status):
-    documents = coll.find({"mse": {"$exists": True}, "status_added": True, "manual_status": status})
+@app.route('/display/<model>/<status>')
+def display_models(model, status):
+    limit = request.args.get('limit',10)
+
+    query = {"model": model, "mse": {"$exists": True}, "manual_status": status}
+    documents = coll.find(query).limit(int(limit))
     plots_params = []
     for document in documents:
         plot_url, params = extract_and_plot(document)
         plots_params.append((plot_url, params))
     return render_template('accepted.html', plots_params=plots_params)
 
-
-
 @app.route('/update_status/<doc_id>/<status>')
 def update_status(doc_id, status):
     document = coll.find_one({"_id": ObjectId(doc_id)})
-    print(f"Status: {status}")
-    print('---------------')
     if document:
         document['manual_status'] = status
-        status_coll.insert_one(document)
-        coll.update_one({"_id": ObjectId(doc_id)}, {"$set":{"status_added":True,"manual_status":status}})
-    return redirect(url_for('index'))
+        coll.update_one({"_id": ObjectId(doc_id)}, {"$set": {"status_added": True, "manual_status": status}})
+    return redirect(url_for('manual_check', model=document['model']))
 
 @app.route('/tide/docs')
 def tide_docs():

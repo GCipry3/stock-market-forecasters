@@ -5,6 +5,7 @@
     <title>Document Review</title>
 </head>
 <body>
+    <a href="/">HOME PAGE</a><br><br>
     <div>
         <h2>Params: {{ params }}</h2>
         <h3>Accepted: {{ accepted }}</h3>
@@ -16,7 +17,7 @@
             <a href="/update_status/{{ doc_id }}/Maybe">Maybe</a>
             <a href="/update_status/{{ doc_id }}/Rejected">Reject</a>
         </div>
-        <p>{{ processed_docs }} processed from {{ total_docs }} documents.</p>
+        <p>{{ processed_docs }} processed , {{ total_docs }} remaining.</p>
     </div>
 </body>
 </html>
