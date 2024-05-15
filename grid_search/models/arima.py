@@ -82,6 +82,11 @@ def plot_full_series(train_series, test_series, prediction, title=""):
     plt.show()
 
 
+def log(message):
+    with open("arima_logs.txt","a") as f:
+        f.write(f"{message}\n")
+
+
 def start_grid_search():
     param_grid = ParameterGrid({
         'p':range(25),
@@ -93,18 +98,18 @@ def start_grid_search():
     random.shuffle(param_list)
 
     total_params = len(param_list)
-    print(f"Starting grid search over {total_params} combinations.")
+    log(f"Starting grid search over {total_params} combinations.")
 
     for i, params in enumerate(param_list):
-        print(f"\n{'*'*50}\nEvaluating Parameters: {params} ({i+1}/{total_params})")
+        log(f"\n{'*'*50}\nEvaluating Parameters: {params} ({i+1}/{total_params})")
         query = {"params": params, "model": "ARIMA"}
         doc = coll.find_one(query)
         
         if doc and doc.get("trained"):
-            print(f"Parameters {params} already evaluated and trained. Skipping.")
+            log(f"Parameters {params} already evaluated and trained. Skipping.")
             continue
         elif doc:
-            print(f"Found incomplete record for {params}. Deleting and re-evaluating.")
+            log(f"Found incomplete record for {params}. Deleting and re-evaluating.")
             coll.delete_one(query)
 
         train_series, test_series = load_data(apply_filter=params["filter"], debug=True)
@@ -123,7 +128,7 @@ def start_grid_search():
 
         try:
             start = time.time()
-            print("Training ARIMA model...")
+            log("Training ARIMA model...")
             model = train_arima(train_series, order=(params["p"], params["d"], params["q"]))
             predictions = generate_predictions(model, start=test_series.index[0], end=test_series.index[-1])
             error = mean_squared_error(test_series, predictions)
@@ -137,9 +142,9 @@ def start_grid_search():
                 "trained": True
             })
             coll.replace_one({"params": params}, results)
-            print(f"Completed: {i+1}/{total_params}. Elapsed time: {elapsed_time:.2f}s. MSE: {error:.4f}")
+            log(f"Completed: {i+1}/{total_params}. Elapsed time: {elapsed_time:.2f}s. MSE: {error:.4f}")
         except Exception as e:
-            print(f"Error during training or prediction with params {params}: {e}")
+            log(f"Error during training or prediction with params {params}: {e}")
             results["error"] = str(e)
             coll.replace_one({"params": params}, results)
 

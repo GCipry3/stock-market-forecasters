@@ -58,12 +58,18 @@ def evaluate_model(model, test_ts):
     error = mse(test_ts, prediction)
     return prediction, error
 
+
+def log(message):
+    with open("tide_logs.txt","a") as f:
+        f.write(f"{message}\n")
+
+
 def start_grid_search():
     param_grid = ParameterGrid({
         'hidden_size': [64, 128, 256],
         'input_chunk_length': [30, 60, 90],
         'output_chunk_length': [10, 20, 30],
-        'n_epochs': [1],
+        'n_epochs': [100,300,500,800],
         'num_decoder_layers': [1, 2, 3],
         'num_encoder_layers': [1, 2, 3],
         'temporal_decoder_hidden': [32, 64],
@@ -75,17 +81,17 @@ def start_grid_search():
     random.shuffle(param_list)
 
     total_params = len(param_list)
-    print(f"Starting grid search over {total_params} combinations.")
+    log(f"Starting grid search over {total_params} combinations.")
     
     for params in param_list:
-        print(f"Evaluating parameters: {params}")
+        log(f"Evaluating parameters: {params}")
         query = {"params": params, "model": "TiDE"}
         doc = coll.find_one(query)
         if doc and doc.get("trained"):
-            print(f"Parameters {params} already evaluated and trained. Skipping.")
+            log(f"Parameters {params} already evaluated and trained. Skipping.")
             continue
         elif doc:
-            print(f"Found incomplete record for {params}. Deleting and re-evaluating.")
+            log(f"Found incomplete record for {params}. Deleting and re-evaluating.")
             coll.delete_one(query)
         
         params_copy = params.copy()
@@ -105,6 +111,7 @@ def start_grid_search():
 
         try:
             start = time.time()
+            log("Training TiDE model...")
             model = train_tide(train_ts, params_copy)
             prediction, error = evaluate_model(model, test_ts)
             elapsed_time = time.time()-start
@@ -117,9 +124,9 @@ def start_grid_search():
             })
 
             coll.replace_one({"params": params}, results)
-            print(f"Parameters {params} trained with MSE: {error}")
+            log(f"Parameters {params} trained with MSE: {error}")
         except Exception as e:
-            print(f"Error during training or prediction with params {params}: {e}")
+            log(f"Error during training or prediction with params {params}: {e}")
             results["error"] = str(e)
             coll.replace_one({"params": params}, results)
 
