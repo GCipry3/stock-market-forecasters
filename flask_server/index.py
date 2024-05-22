@@ -56,14 +56,15 @@ def index():
 
 @app.route('/manual_check/<model>')
 def manual_check(model):
-    document = coll.find_one({"model": model, "mse": {"$exists": True}, "manual_status": {"$exists": False}})
+    query = {"model": model, "mse": {"$exists": True}, "manual_status": {"$exists": False}}
+    document = coll.find_one(query)
     if document:
         plot_url, params = extract_and_plot(document)
         processed_docs = coll.count_documents({"model": model, "manual_status": {"$exists": True}})
         accepted = coll.count_documents({'model': model, 'manual_status': 'Accepted'})
         maybe = coll.count_documents({'model': model, 'manual_status': 'Maybe'})
         rejected = coll.count_documents({'model': model, 'manual_status': 'Rejected'})
-        total_docs = coll.count_documents({"model": model, "manual_status": {"$exists": False}})
+        total_docs = coll.count_documents(query)
         return render_template('index.html', plot_url=plot_url, params=params, doc_id=document['_id'],
                                total_docs=total_docs, processed_docs=processed_docs, accepted=accepted, maybe=maybe, rejected=rejected)
     else:
