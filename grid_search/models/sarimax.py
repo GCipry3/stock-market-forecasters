@@ -40,7 +40,7 @@ def load_data(ticker="^GSPC", start_date='1990-01-02', end_date='2024-03-28', sp
     return train_series, test_series
 
 def apply_butterworth_filter(series, order=3, critical_frequency=0.05, debug=False):
-    """ Applies a zero-phase Butterworth filter to a given pandas Series. """
+    """ Applies Butterworth filter to a given pandas Series. """
     b, a = butter(order, critical_frequency, btype='low', analog=False)
     filtered_values = filtfilt(b, a, series)
     filtered_series = pd.Series(filtered_values, index=series.index)

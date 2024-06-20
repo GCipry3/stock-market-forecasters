@@ -1,0 +1,113 @@
+{
+  "_id": {
+    "$oid": "6607e76bdeffe8a8c0d8e08f"
+  },
+  "model": "TiDE",
+  "params": {
+    "filter": false,
+    "hidden_size": 64,
+    "input_chunk_length": 20,
+    "n_epochs": 200,
+    "num_decoder_layers": 3,
+    "num_encoder_layers": 2,
+    "output_chunk_length": 60,
+    "temporal_decoder_hidden": 64
+  },
+  "len_train": 8609,
+  "len_test": 324,
+  "test": [
+  ],
+  "test_start_date": "2023-01-02",
+  "test_end_date": "2024-03-28",
+  "trained": true,
+  "elapsed_time": 1705.5432090759277,
+  "mse": 18782.96704664109,
+  "len_prediction": 324,
+  "prediction": [
+  ],
+  "status_added": true,
+  "manual_status": "Accepted",
+  "r": 0.9288689217538424,
+  "unfiltered_test": [
+  ],
+  "elapsed_time_min": 28.425720151265462,
+  "mae": 108.68405565803434
+}
+
+{
+  "_id": {
+    "$oid": "6645539cdb5fa0c6dad43052"
+  },
+  "model": "ARIMA",
+  "params": {
+    "d": 1,
+    "filter": true,
+    "p": 1,
+    "q": 5
+  },
+  "len_train": 8609,
+  "len_test": 324,
+  "test": [
+  ],
+  "test_start_date": "2023-01-02",
+  "test_end_date": "2024-03-28",
+  "trained": true,
+  "elapsed_time": 41.909833908081055,
+  "mse": 33114.035699722226,
+  "len_prediction": 324,
+  "prediction": [
+  ],
+  "manual_status": "Accepted",
+  "status_added": true,
+  "r": 0.8737750677542937,
+  "unfiltered_test": [
+  ],
+  "elapsed_time_min": 0.6984972318013509,
+  "mae": 139.5604298799654
+}
+
+{
+  "_id": {
+    "$oid": "6646075b03dd722d128d28fb"
+  },
+  "model": "SARIMAX",
+  "params": {
+    "D": 1,
+    "P": 2,
+    "Q": 0,
+    "d": 1,
+    "filter": true,
+    "p": 0,
+    "q": 3,
+    "s": 5
+  },
+  "len_train": 8609,
+  "len_test": 324,
+  "test": [
+  ],
+  "test_start_date": "2023-01-02",
+  "test_end_date": "2024-03-28",
+  "trained": true,
+  "elapsed_time": 17.537692546844482,
+  "mse": 22048.183573892184,
+  "len_prediction": 324,
+  "prediction": [
+  ],
+  "manual_status": "Accepted",
+  "status_added": true,
+  "r": 0.9178145686384773,
+  "unfiltered_test": [
+  ],
+  "elapsed_time_min": 0.29229487578074137,
+  "mae": 113.85298466935485
+}
+
+
+{
+  "model": "Linear Regression",
+  "test_start_date": "2023-01-02",
+  "test_end_date": "2024-03-28",
+  "mse": 1940992.2951213908,
+  "mae": 1355.5139183730982,
+  "r": 0.923
+}

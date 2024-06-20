@@ -12,8 +12,9 @@
 <body>
     <a href="/">HOME PAGE</a><br><br>
     <h1>{{ status }} Models</h1>
-    {% for plot_url, params in plots_params %}
+    {% for plot_url, params, metrics in plots_params %}
         <div class="plot">
+            <h2>Metrics: {{ metrics }}</h2>
             <h2>Params: {{ params }}</h2>
             <img src="data:image/png;base64,{{ plot_url }}" alt="Plot">
             <hr>

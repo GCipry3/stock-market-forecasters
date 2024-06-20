@@ -21,7 +21,7 @@ client = pymongo.MongoClient(uri)
 db = client["Licenta"]
 coll = db['SP500_forecast_models']
 
-def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries):
+def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title):
     plt.figure(figsize=(10, 6))
     test_ts.plot(label='Test', lw=0.5)
     prediction.plot(label='Predictions', lw=0.5)
@@ -30,7 +30,10 @@ def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries):
     predicted_values = prediction.values().flatten()
     error = np.mean((actual_values - predicted_values) ** 2)
     
-    plt.title(f'Forecast with MSE: {error:.2f}')
+    if title:
+        plt.title(title)
+    else:
+        plt.title(f'Forecast with MSE: {error:.2f}')
     plt.legend()
     
     img = io.BytesIO()
@@ -45,10 +48,15 @@ def extract_and_plot(doc):
     prediction_array = doc['prediction']
     start_date = doc['test_start_date']
     end_date = doc['test_end_date']
+    model = doc['model']
+    params = doc['params']
+    filter = params['filter']
     business_days = pd.date_range(start=start_date, end=end_date, freq='B')
     test_ts = TimeSeries.from_times_and_values(business_days, np.array(test_array))
     prediction_ts = TimeSeries.from_times_and_values(business_days, np.array(prediction_array))
-    return plot_forecast_only(test_ts, prediction_ts), doc['params']
+
+    title = f'{model} model' if not filter else f'{model} model with Butterworth Filter'
+    return plot_forecast_only(test_ts, prediction_ts, title=title), doc['params']
 
 @app.route('/')
 def index():
@@ -79,7 +87,8 @@ def display_models(model, status):
     plots_params = []
     for document in documents:
         plot_url, params = extract_and_plot(document)
-        plots_params.append((plot_url, params))
+        metrics = {'mse':document['mse'], 'r':document['r']}
+        plots_params.append((plot_url, params, metrics))
     return render_template('accepted.html', plots_params=plots_params)
 
 @app.route('/update_status/<doc_id>/<status>')
