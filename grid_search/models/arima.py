@@ -49,7 +49,7 @@ def apply_butterworth_filter(series, order=3, critical_frequency=0.05, debug=Fal
     filtered_values = filtfilt(b, a, series)
     filtered_series = pd.Series(filtered_values, index=series.index)
     if debug:
-        print("✅ Zero-phase Butterworth filter applied.")
+        print(" Zero-phase Butterworth filter applied.")
     return filtered_series
 
 def train_arima(train_series, order=(1, 1, 1)):
@@ -144,7 +144,6 @@ def start_grid_search():
             coll.replace_one({"params": params}, results)
             log(f"Completed: {i+1}/{total_params}. Elapsed time: {elapsed_time:.2f}s. MSE: {error:.4f}")
         except Exception as e:
-            log(f"Error during training or prediction with params {params}: {e}")
             results["error"] = str(e)
             coll.replace_one({"params": params}, results)
 

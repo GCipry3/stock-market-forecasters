@@ -69,7 +69,7 @@ def start_grid_search():
         'hidden_size': [64, 128, 256],
         'input_chunk_length': [30, 60, 90],
         'output_chunk_length': [10, 20, 30],
-        'n_epochs': [100,300,500,800],
+        'n_epochs': [100,300,500,800,1000],
         'num_decoder_layers': [1, 2, 3],
         'num_encoder_layers': [1, 2, 3],
         'temporal_decoder_hidden': [32, 64],
@@ -126,7 +126,6 @@ def start_grid_search():
             coll.replace_one({"params": params}, results)
             log(f"Parameters {params} trained with MSE: {error}")
         except Exception as e:
-            log(f"Error during training or prediction with params {params}: {e}")
             results["error"] = str(e)
             coll.replace_one({"params": params}, results)
 

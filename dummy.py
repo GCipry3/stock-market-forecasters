@@ -28,7 +28,7 @@ def apply_butterworth_filter(series, order=3, critical_frequency=0.05, debug=Fal
     filtered_values = filtfilt(b, a, series)
     filtered_series = pd.Series(filtered_values, index=series.index)
     if debug:
-        print("✅ Zero-phase Butterworth filter applied.")
+        print(" Butterworth filter applied.")
     return filtered_series
 
 def train_model(train_series, use_gradient=False):
@@ -110,7 +110,7 @@ def generate_predictions(train_series, test_series, start=None, end=None, debug=
     predictions = b0 + b1 * x
     if debug:
         print(predictions.head())
-        print(f"✅ Forecast generated.")
+        print(f" Forecast generated.")
     return predictions
 
 
