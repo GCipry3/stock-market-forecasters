@@ -10,6 +10,7 @@ from darts import TimeSeries
 import io
 import base64
 from bson.objectid import ObjectId
+from utils import load_data
 
 matplotlib.use('Agg')
 
@@ -21,8 +22,12 @@ client = pymongo.MongoClient(uri)
 db = client["Licenta"]
 coll = db['SP500_forecast_models']
 
-def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title):
-    plt.figure(figsize=(10, 6))
+TRAIN_TS = load_data(apply_filter=filter)[0]
+
+def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title, train_ts: TimeSeries = None):
+    plt.figure(figsize=(12, 6))
+    if train_ts:
+        train_ts.plot(label='Train', lw=0.5)
     test_ts.plot(label='Test', lw=0.5)
     prediction.plot(label='Predictions', lw=0.5)
     
@@ -44,7 +49,7 @@ def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title):
     return plot_url
 
 def extract_and_plot(doc):
-    test_array = doc['test']
+    test_array = doc['unfiltered_test']
     prediction_array = doc['prediction']
     start_date = doc['test_start_date']
     end_date = doc['test_end_date']
@@ -56,7 +61,7 @@ def extract_and_plot(doc):
     prediction_ts = TimeSeries.from_times_and_values(business_days, np.array(prediction_array))
 
     title = f'{model} model' if not filter else f'{model} model with Butterworth Filter'
-    return plot_forecast_only(test_ts, prediction_ts, title=title), doc['params']
+    return plot_forecast_only(test_ts, prediction_ts, title=title), plot_forecast_only(test_ts, prediction_ts, title=title, train_ts=TRAIN_TS), doc['params']
 
 @app.route('/')
 def index():
@@ -86,9 +91,11 @@ def display_models(model, status):
     documents = coll.find(query).limit(int(limit))
     plots_params = []
     for document in documents:
-        plot_url, params = extract_and_plot(document)
-        metrics = {'mse':document['mse'], 'r':document['r']}
-        plots_params.append((plot_url, params, metrics))
+        plot_url1, plot_url2, params = extract_and_plot(document)
+        filtered = params['filter']
+        del params['filter']
+        metrics = {'mse':document['mse'], 'mae': document['mae'], 'r':document['r']}
+        plots_params.append((plot_url1, plot_url2, params, metrics, filtered))
     return render_template('accepted.html', plots_params=plots_params)
 
 @app.route('/update_status/<doc_id>/<status>')

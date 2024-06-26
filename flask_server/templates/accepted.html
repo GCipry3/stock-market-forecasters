@@ -7,16 +7,27 @@
         .plot {
             margin-bottom: 20px;
         }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+        }
+        .image-container img {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <a href="/">HOME PAGE</a><br><br>
     <h1>{{ status }} Models</h1>
-    {% for plot_url, params, metrics in plots_params %}
+    {% for plot_url1, plot_url2, params, metrics, filtered in plots_params %}
         <div class="plot">
             <h2>Metrics: {{ metrics }}</h2>
             <h2>Params: {{ params }}</h2>
-            <img src="data:image/png;base64,{{ plot_url }}" alt="Plot">
+            <h2>Filtered Training Set: {{ filtered }}</h2>
+            <div class="image-container">
+                <img src="data:image/png;base64,{{ plot_url1 }}" alt="Plot">
+                <img src="data:image/png;base64,{{ plot_url2 }}" alt="Plot">
+            </div>
             <hr>
         </div>
     {% endfor %}

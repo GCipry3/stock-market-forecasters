@@ -33,7 +33,7 @@ def convert_numpy(obj):
         return obj
 
 
-def load_data(ticker="^GSPC", start_date='1990-01-02', end_date='2024-03-20', split_date='2020-01-01', apply_filter=False, debug=False):
+def load_data(ticker="^GSPC", start_date='1990-01-02', end_date='2024-03-20', split_date='2023-01-01', apply_filter=False, debug=False):
     df = yf.download(ticker, start=start_date, end=end_date)['Close']
     df = df.reindex(pd.date_range(start=start_date, end=end_date, freq='B')).ffill()
     if apply_filter:
