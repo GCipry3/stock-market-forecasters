@@ -89,9 +89,9 @@ def log(message):
 
 def start_grid_search():
     param_grid = ParameterGrid({
-        'p':range(20),
+        'p':range(40),
         'd':range(2),
-        'q':range(20),
+        'q':range(40),
         'filter':[True,False]
     })
     param_list = list(param_grid)
