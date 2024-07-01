@@ -27,9 +27,9 @@ TRAIN_TS = load_data(apply_filter=filter)[0]
 def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title, train_ts: TimeSeries = None):
     plt.figure(figsize=(12, 6))
     if train_ts:
-        train_ts.plot(label='Train', lw=0.5)
-    test_ts.plot(label='Test', lw=0.5)
-    prediction.plot(label='Predictions', lw=0.5)
+        train_ts.plot(label='Train', lw=0.5, color='blue')
+    test_ts.plot(label='Test', lw=0.5, color='green')
+    prediction.plot(label='Predictions', lw=0.5, color='red')
     
     actual_values = test_ts.values().flatten()
     predicted_values = prediction.values().flatten()
@@ -40,6 +40,16 @@ def plot_forecast_only(test_ts: TimeSeries, prediction: TimeSeries, title, train
     else:
         plt.title(f'Forecast with MSE: {error:.2f}')
     plt.legend()
+
+    # Disable the grid
+    plt.grid(False)
+    
+    # Add a box border
+    ax = plt.gca()
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.spines['bottom'].set_visible(True)
+    ax.spines['left'].set_visible(True)
     
     img = io.BytesIO()
     plt.savefig(img, format='png')
